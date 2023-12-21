@@ -1,2 +1,5 @@
 # local environment file
 .env
+
+db/*
+!.gitkeep
