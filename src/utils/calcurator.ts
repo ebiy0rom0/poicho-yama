@@ -1,41 +1,40 @@
-import { dbHandler } from "../clients/dbHandler.ts"
-import { Combinations } from "../structures/types/mod.ts"
+import { MatrixRepository } from "../repositories/matrix.ts";
+import { Matrix, MatrixRows } from "../structures/types/mod.ts";
 
 const MAX_BONUS = 400     // from 0% to 400%
 const SCORE_RANGE = 125   // from 0 to 2,500,000
 
 export class PointCalculator {
-  #matrix = new Map<number, Combinations>
+  #matrix: Matrix = new Map<number, MatrixRows>()
 
   private constructor() {}
 
-  private load = async () => {
-    const matrix = await dbHandler.list<Combinations>({ prefix: ["matrix"] })
-    for await (const row of matrix) {
-      this.#matrix.set(row.key[1] as number, row.value)
-    }
+  private load = async (base: number) => {
+    this.#matrix = await MatrixRepository.getMatrix(base)
 
     if (this.#matrix.size > 0) return
 
     for (let bonus = 0; bonus < MAX_BONUS; bonus ++) {
       for (let score = 0; score < SCORE_RANGE; score ++) {
-        const pt = Math.floor((100 + score) * (100 + bonus) / 100)
-        let combi: Combinations = []
-        if (this.#matrix.has(pt)) {
-          combi = this.#matrix.get(pt)!
+        const point = Math.floor((base + score) * (100 + bonus) / 100)
+        let rows: MatrixRows = []
+        if (this.#matrix.has(point)) {
+          rows = this.#matrix.get(point)!
         }
-        combi.push({ bonus: bonus, score: score * 20000 })
-        this.#matrix.set(pt, combi)
+        rows.push({ bonus: bonus, score: score * 20000 })
+        this.#matrix.set(point, rows)
       }
     }
-    await this.#matrix.forEach(async (v, k) => await dbHandler.set(["matrix", k], v))
+    await this.#matrix.forEach(async (rows, point) =>
+      await MatrixRepository.setMatrixRow(base, point, rows)
+    )
   }
 
-  static New = async () => {
+  static New = async (base: number) => {
     const ins = new PointCalculator()
-    await ins.load()
+    await ins.load(base)
     return ins
   }
 
-  findCombination = (pt: number): Combinations => this.#matrix.get(pt) ?? []
+  findRows = (pt: number): MatrixRows => this.#matrix.get(pt) ?? []
 }
