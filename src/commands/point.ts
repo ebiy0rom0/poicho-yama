@@ -1,10 +1,11 @@
 import { Messages, T } from "../config/messages.ts"
 import { ApplicationCommandOptionTypes } from "../deps.ts"
 import { createCommand } from "../utils/command.ts"
-import { createEmbed } from "../utils/embed.ts"
+import { createEmbed, createEmbedFiled, createEmbedFooter } from "../utils/embed.ts"
 import { createPager, parseCustomID } from "../utils/component.ts"
 import { PointCalculator } from "../utils/calcurator.ts"
 import { InteractionRepository } from "../repositories/interaction.ts"
+import { findMusic } from "../config/musics.ts";
 
 const CONTENTS_LIMIT = 10
 
@@ -21,13 +22,16 @@ export default createCommand({
   ],
 
   execute: async ctx => {
-    const calcurator = await PointCalculator.New()
     const point = ctx.getOption<number>("point")!
-    const combination = await calcurator.findCombination(point)
+    const title = ctx.getOption<string>("music")!
+    const music = findMusic(title)
+
+    const calcurator = await PointCalculator.New(music.base)
+    const rows = await calcurator.findRows(point)
 
     const timestamp = await InteractionRepository.setToken(ctx.interaction.guildId!, ctx.interaction.token)
 
-    if (combination.length === 0) {
+    if (rows.length === 0) {
       await ctx.reply({ content: "not found" })
       return
     }
@@ -37,20 +41,26 @@ export default createCommand({
       content: T(Messages.Info, point),
       embeds: [
         createEmbed({
-          title: `🦐🦐 ${point}pt`,
-          description: generateMessage(combination, CONTENTS_LIMIT, 0),
-          color: 0xffa500
+          title: music.title,
+          description: `基礎点: ${music.base}`,
+          color: 0xffa500,
+          fields: generateMessageFields(rows, CONTENTS_LIMIT, 0),
+          footer: createEmbedFooter({
+            text: "調整頑張ってね～♪"
+          })
         })
       ],
-      components: [ createPager(combination, CONTENTS_LIMIT, 1, false, point, timestamp) ]
+      components: [ createPager(rows, CONTENTS_LIMIT, 1, false, music.title, point, timestamp) ]
     })
   },
 
   executeComponent: async ctx => {
-    const calcurator = await PointCalculator.New()
     ctx.replyOnce({})  // empty reply
-    const [, currentPage, point, timestamp] = parseCustomID(ctx.customID)
-    const combination = await calcurator.findCombination(+point)
+    const [, currentPage, title, point, timestamp] = parseCustomID(ctx.customID)
+    const music = findMusic(title)
+
+    const calcurator = await PointCalculator.New(music.base)
+    const rows = await calcurator.findRows(+point)
 
     const token = await InteractionRepository.getToken(ctx.interaction.guildId!, +timestamp)
     ctx.editOriginalResponse(token.value!, {
@@ -58,18 +68,24 @@ export default createCommand({
       content: T(Messages.Info, point),
       embeds: [
         createEmbed({
-          title: `🦐🦐 ${point}pt`,
-          description: generateMessage(combination, CONTENTS_LIMIT, (+currentPage - 1) * CONTENTS_LIMIT),
-          color: 0xffa500
+          title: music.title,
+          description: `基礎点: ${music.base}`,
+          color: 0xffa500,
+          fields: generateMessageFields(rows, CONTENTS_LIMIT, +currentPage),
+          footer: createEmbedFooter({
+            text: "調整頑張ってね～♪"
+          })
         })
       ],
-      components: [ createPager(combination, CONTENTS_LIMIT, +currentPage, false, +point, timestamp) ]
+      components: [ createPager(rows, CONTENTS_LIMIT, +currentPage, false, music.title, +point, timestamp) ]
     })
   }
 })
 
 // deno-lint-ignore no-explicit-any
-const generateMessage = (contents: any[], limit: number, offset: number) =>
-  contents.slice(offset, offset + limit).map(v =>
-    `${String(v.score.toLocaleString())} ~ ${(v.score + 19999).toLocaleString()} (${v.bonus}%)`
-  ).join("\r")
+const generateMessageFields = (contents: any[], limit: number, offset: number) =>
+  contents.slice(offset, offset + limit).map(v => createEmbedFiled({
+    name: `${v.bonus}%`,
+    value: `${String(v.score.toLocaleString())} - ${(v.score + 19999).toLocaleString()}`,
+    inline: true,
+  }))
