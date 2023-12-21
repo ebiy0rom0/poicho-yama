@@ -31,6 +31,12 @@ export const createPager = (contents: any[], limit: number, currentPage: number,
   const max = Math.ceil(contents.length / limit)
   return createActionRow([
     createButton({
+      label: "|<<",
+      style: ButtonStyles.Primary,
+      customId: generateCustomID("left-end", 1, ...params),
+      disabled: forcedDisable || currentPage === 1,
+    }),
+    createButton({
       label: "<",
       style: ButtonStyles.Primary,
       customId: generateCustomID("left", currentPage - 1, ...params),
@@ -46,6 +52,12 @@ export const createPager = (contents: any[], limit: number, currentPage: number,
       label: ">",
       style: ButtonStyles.Primary,
       customId: generateCustomID("right", currentPage + 1, ...params),
+      disabled: forcedDisable || currentPage === max
+    }),
+    createButton({
+      label: ">>|",
+      style: ButtonStyles.Primary,
+      customId: generateCustomID("right-end", max, ...params),
       disabled: forcedDisable || currentPage === max
     })
   ])
