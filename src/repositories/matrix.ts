@@ -1,16 +1,27 @@
 import { dbHandler } from "../clients/dbHandler.ts"
-import { Combinations } from "../structures/types/mod.ts"
+import { Matrix, MatrixRows } from "../structures/types/mod.ts"
 
 const TOP_KEY = "matrix"
 
 export class MatrixRepository {
   private constructor() {}
 
-  static setMatrix = async (music: string, point: number, row: Combinations): Promise<void> => {
-    await dbHandler.set([TOP_KEY, music, point], row)
+  static setMatrixRow = async (base: number, point: number, rows: MatrixRows): Promise<void> => {
+    await dbHandler.set([TOP_KEY, base, point], rows)
   }
 
-  static getMatrix = async (music: string, point: number): Promise<Deno.KvEntryMaybe<Combinations>> => {
-    return await dbHandler.get<Combinations>([TOP_KEY, music, point])
+  static getMatrixRow = async (base: number, point: number): Promise<MatrixRows> => {
+    const rows = await dbHandler.get<MatrixRows>([TOP_KEY, base, point])
+    return rows.value ?? []
+  }
+
+  static getMatrix = async (base: number): Promise<Matrix> => {
+    const matrixIter = await dbHandler.list<MatrixRows>({ prefix: [TOP_KEY, base] })
+    const matrix = new Map<number, MatrixRows>()
+    for await (const row of matrixIter) {
+      const [,, point] = row.key
+      matrix.set(point as number, row.value)
+    }
+    return matrix
   }
 }

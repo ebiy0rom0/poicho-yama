@@ -1,8 +1,10 @@
 
-export type Combination = {
+export type Matrix = Map<number, MatrixRows>
+
+export type MatrixRow = {
   bonus: number,
   score: number
 }
 
-export type Combinations = Combination[]
+export type MatrixRows = MatrixRow[]
 
