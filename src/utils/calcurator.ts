@@ -26,7 +26,7 @@ export class PointCalculator {
       }
     }
     await this.#matrix.forEach(async (rows, point) =>
-      await MatrixRepository.setMatrixRow(base, point, rows)
+      await MatrixRepository.setMatrixRows(base, point, rows)
     )
   }
 
