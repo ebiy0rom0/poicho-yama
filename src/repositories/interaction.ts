@@ -7,11 +7,18 @@ export class InteractionRepository {
 
   static setToken = async (guildID: bigint, token: string): Promise<number> => {
     const timestamp = Date.now()
-    await dbHandler.set([TOP_KEY, "token", `${guildID}/${timestamp}`], [token])
+    const expiredIn = timestamp + 5 * 60 * 1000  // 5 minutes later
+    await dbHandler.set([TOP_KEY, "token", `${guildID}/${timestamp}`], { token, expiredIn })
+
     return timestamp
   }
 
-  static getToken = async (guildID: bigint, timestamp: number): Promise<Deno.KvEntryMaybe<string>> => {
+  static getOriginalToken = async (guildID: bigint, timestamp: number): Promise<string | undefined> => {
+    const interaction = await dbHandler.get<{ token: string, expiredIn: number }>([TOP_KEY, "token", `${guildID}/${timestamp}`])
+    return interaction.value?.token
+  }
+
+  static getExpiredTokens = async (guildID: bigint, timestamp: number): Promise<Deno.KvEntryMaybe<string>> => {
     return await dbHandler.get<string>([TOP_KEY, "token", `${guildID}/${timestamp}`])
   }
 }

@@ -29,12 +29,11 @@ export default createCommand({
     const calcurator = await PointCalculator.New(music.base)
     const rows = await calcurator.findRows(point)
 
-    const timestamp = await InteractionRepository.setToken(ctx.interaction.guildId!, ctx.interaction.token)
-
     if (rows.length === 0) {
       await ctx.reply({ content: "not found" })
       return
     }
+    const timestamp = await InteractionRepository.setToken(ctx.interaction.guildId!, ctx.interaction.token)
 
     await ctx.reply({
       customId: name,
@@ -62,8 +61,16 @@ export default createCommand({
     const calcurator = await PointCalculator.New(music.base)
     const rows = await calcurator.findRows(+point)
 
-    const token = await InteractionRepository.getToken(ctx.interaction.guildId!, +timestamp)
-    ctx.editOriginalResponse(token.value!, {
+    const token = await InteractionRepository.getOriginalToken(ctx.interaction.guildId!, +timestamp)
+    if (typeof token === "undefined") {
+      ctx.reply({
+        content: "[ERROR]Original interaction token has expired."
+      })
+      return
+    }
+    console.log(await ctx.getOriginalMessage(token))
+
+    ctx.editOriginalResponse(token, {
       customId: name,
       content: T(Messages.Info, point),
       embeds: [

@@ -18,6 +18,10 @@ export class InteractionContextImpl implements InteractionContext {
     return options.find(opt => opt.name === name)?.value as T
   }
 
+  getOriginalMessage = async (token: string) => {
+    return await bot.helpers.getOriginalInteractionResponse(token)
+  }
+
   reply = async (options: InteractionCallbackData) => {
     if (this.replied) {
       await bot.helpers.editOriginalInteractionResponse(
