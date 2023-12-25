@@ -1,4 +1,5 @@
 import "./config/load.ts"
+import "./cron/load.ts"
 import { startBot, http } from "./deps.ts"
 import { bot } from "./clients/bot.ts"
 import { httpListener } from "./clients/httpListener.ts"

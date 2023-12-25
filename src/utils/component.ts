@@ -1,4 +1,4 @@
-import { ActionRow, ButtonComponent, ButtonStyles, Interaction, InteractionTypes, MessageComponentTypes } from "../deps.ts"
+import { ActionRow, ButtonComponent, ButtonStyles, Component, Interaction, InteractionTypes, MessageComponentTypes } from "../deps.ts"
 
 type OptionalProperty<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>
 
@@ -50,15 +50,26 @@ export const createPager = (contents: any[], limit: number, currentPage: number,
     }),
     createButton({
       label: ">",
-      style: ButtonStyles.Primary,
+      style: ButtonStyles.Success,
       customId: generateCustomID("right", currentPage + 1, ...params),
       disabled: forcedDisable || currentPage === max
     }),
     createButton({
       label: ">>|",
-      style: ButtonStyles.Primary,
+      style: ButtonStyles.Success,
       customId: generateCustomID("right-end", max, ...params),
       disabled: forcedDisable || currentPage === max
     })
   ])
+}
+
+export const disableButtonComponents = (component: Component) => {
+  switch (component.type) {
+    case MessageComponentTypes.ActionRow:
+      component.components!.map(component => disableButtonComponents(component))
+      break
+    case MessageComponentTypes.Button:
+      component.disabled = true
+  }
+  return component
 }

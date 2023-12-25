@@ -19,7 +19,11 @@ export class InteractionContextImpl implements InteractionContext {
   }
 
   getOriginalMessage = async (token: string) => {
-    return await bot.helpers.getOriginalInteractionResponse(token)
+    try {
+      return await bot.helpers.getOriginalInteractionResponse(token)
+    } catch (error: unknown) {
+    }
+    return
   }
 
   reply = async (options: InteractionCallbackData) => {
