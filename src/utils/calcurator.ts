@@ -1,8 +1,8 @@
-import { MatrixRepository } from "../repositories/matrix.ts";
-import { Matrix, MatrixRows } from "../structures/types/mod.ts";
+import { MatrixRepository } from "../repositories/matrix.ts"
+import { Matrix, MatrixRows } from "../structures/types/mod.ts"
 
-const MAX_BONUS = 400     // from 0% to 400%
-const SCORE_RANGE = 125   // from 0 to 2,500,000
+const MAX_BONUS = 400 // from 0% to 400%
+const SCORE_RANGE = 125 // from 0 to 2,500,000
 
 export class PointCalculator {
   #matrix: Matrix = new Map<number, MatrixRows>()
@@ -14,8 +14,8 @@ export class PointCalculator {
 
     if (this.#matrix.size > 0) return
 
-    for (let bonus = 0; bonus < MAX_BONUS; bonus ++) {
-      for (let score = 0; score < SCORE_RANGE; score ++) {
+    for (let bonus = 0; bonus < MAX_BONUS; bonus++) {
+      for (let score = 0; score < SCORE_RANGE; score++) {
         const point = Math.floor((base + score) * (100 + bonus) / 100)
         let rows: MatrixRows = []
         if (this.#matrix.has(point)) {
