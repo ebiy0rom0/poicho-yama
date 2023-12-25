@@ -43,6 +43,9 @@ export default createCommand({
           title: music.title,
           description: `基礎点: ${music.base}`,
           color: 0xffa500,
+          thumbnail: {
+            url: music.url
+          },
           fields: generateMessageFields(rows, CONTENTS_LIMIT, 0),
           footer: createEmbedFooter({
             text: "調整頑張ってね～♪"
@@ -68,7 +71,6 @@ export default createCommand({
       })
       return
     }
-    console.log(await ctx.getOriginalMessage(token))
 
     ctx.editOriginalResponse(token, {
       customId: name,
@@ -78,7 +80,10 @@ export default createCommand({
           title: music.title,
           description: `基礎点: ${music.base}`,
           color: 0xffa500,
-          fields: generateMessageFields(rows, CONTENTS_LIMIT, +currentPage),
+          thumbnail: {
+            url: music.url
+          },
+          fields: generateMessageFields(rows, CONTENTS_LIMIT, (+currentPage - 1) * CONTENTS_LIMIT),
           footer: createEmbedFooter({
             text: "調整頑張ってね～♪"
           })
