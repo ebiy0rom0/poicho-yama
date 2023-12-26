@@ -1,6 +1,8 @@
-import { InteractionContextImpl } from "../commands/interactionContext.ts"
+import { InteractionContext } from "../commands/interactionContext.ts"
+import { ChatInputInteractionReplyer } from "../types/mod.ts"
 
-export class ChatInputInteractionContext extends InteractionContextImpl {
+// deno-fmt-ignore
+export class ChatInputInteractionContext extends InteractionContext implements ChatInputInteractionReplyer {
   get command() {
     return this.interaction.data?.name!
   }
