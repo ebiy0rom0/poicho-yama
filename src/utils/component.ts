@@ -29,7 +29,7 @@ export const createButton = (
 
 export const generateCustomID = (
   id: string,
-  ...values: (number | string)[]
+  ...values: (string | number)[]
 ): string => `${id}:${values.join(":")}`
 
 export const parseCustomID = (customID: string): [string, ...string[]] => {
@@ -37,14 +37,12 @@ export const parseCustomID = (customID: string): [string, ...string[]] => {
   return [id, ...values]
 }
 
-export const createPager = (
-  // deno-lint-ignore no-explicit-any
-  contents: any[],
+export const createPager = <T>(
+  contents: T[],
   limit: number,
   currentPage: number,
   forcedDisable = false,
-  // deno-lint-ignore no-explicit-any
-  ...params: any[]
+  ...params: (number | string)[]
 ): ActionRow => {
   const max = Math.ceil(contents.length / limit)
   return createActionRow([
