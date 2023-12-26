@@ -6,10 +6,8 @@ import { createPager } from "../../utils/component.ts"
 import { PointCalculator } from "../../utils/calcurator.ts"
 import { InteractionRepository } from "../../repositories/interaction.ts"
 import { findMusic } from "../../config/musics.ts"
-import {
-  CONTENTS_LIMIT,
-  generateMessageFields,
-} from "../../utils/commands/point.ts"
+import { CONTENTS_LIMIT, generateMessageFields } from "../../utils/commands/point.ts"
+import { Failure, SuccessOnly } from "../../structures/types/result.ts"
 
 const PointCommand = createCommand({
   name: "point",
@@ -33,18 +31,26 @@ const PointCommand = createCommand({
     const title = ctx.getOption<string>("music")!
     const music = findMusic(title)
 
-    const calcurator = await PointCalculator.New(music.base)
-    const rows = await calcurator.findRows(point)
+    const result = await PointCalculator.New(music.base)
+    if (!result.ok) {
+      return Failure(new Error(""))
+    }
+
+    const calcurator = result.value
+    const rows = calcurator.findRows(point)
 
     if (rows.length === 0) {
-      await ctx.reply({ content: "not found" })
-      return
+      await ctx.reply({ content: Messages.NotFound })
+      return Failure(new Error("rows not found"))
     }
     const timestamp = await InteractionRepository.setToken(
       ctx.interaction.guildId!,
       ctx.interaction.token,
     )
 
+    if (rows.length === 0) {
+      return Failure(new Error(""))
+    }
     await ctx.reply({
       customId: name,
       content: T(Messages.Info, point),
@@ -75,6 +81,8 @@ const PointCommand = createCommand({
       ],
       flags: 1 << 6,
     })
+
+    return SuccessOnly()
   },
 })
 

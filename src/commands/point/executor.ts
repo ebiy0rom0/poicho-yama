@@ -1,12 +1,11 @@
 import { Messages, T } from "../../config/messages.ts"
 import { findMusic } from "../../config/musics.ts"
 import { InteractionRepository } from "../../repositories/interaction.ts"
+import { InteractionContextWithToken } from "../../structures/commands/interactionContext.ts"
+import { Failure, SuccessOnly } from "../../structures/types/result.ts"
 import { PointCalculator } from "../../utils/calcurator.ts"
 import { createExecutor } from "../../utils/command.ts"
-import {
-  CONTENTS_LIMIT,
-  generateMessageFields,
-} from "../../utils/commands/point.ts"
+import { CONTENTS_LIMIT, generateMessageFields } from "../../utils/commands/point.ts"
 import { createPager, parseCustomID } from "../../utils/component.ts"
 import { createEmbed, createEmbedFooter } from "../../utils/embed.ts"
 
@@ -18,8 +17,14 @@ const PointExecutor = createExecutor({
     )
     const music = findMusic(title)
 
-    const calcurator = await PointCalculator.New(music.base)
-    const rows = await calcurator.findRows(+point)
+    const result = await PointCalculator.New(music.base)
+    if (!result.ok) {
+      return Failure(result.err)
+    }
+
+    const calcurator = result.value
+    const rows = calcurator.findRows(+point)
+    // For pager operation, omit the check since it's always present.
 
     const token = await InteractionRepository.getOriginalToken(
       ctx.interaction.guildId!,
@@ -29,12 +34,13 @@ const PointExecutor = createExecutor({
       ctx.reply({
         content: "[ERROR]Original interaction token has expired.",
       })
-      return
+      return Failure(new Error(""))
     }
 
     // It's possible to recover from the orginal message,
     // but rebuild the message to reduce the number of API requests.
-    ctx.editOriginalResponse(token, {
+    const tctx = new InteractionContextWithToken(token)
+    tctx.editOriginalResponse({
       customId: name,
       content: T(Messages.Info, point),
       embeds: [
@@ -67,6 +73,7 @@ const PointExecutor = createExecutor({
         ),
       ],
     })
+    return SuccessOnly()
   },
 })
 

@@ -4,7 +4,7 @@ import PointExecutor from "../commands/point/executor.ts"
 import { Interaction } from "../deps.ts"
 import { ChatInputInteractionContext } from "../structures/commands/chatInputInteractionContext.ts"
 import { MessageComponentInteractionContext } from "../structures/commands/componentInteractionContext.ts"
-import { InteractionContext } from "../structures/types/mod.ts"
+import { InteractionReplyer } from "../structures/types/interaction.ts"
 import { isComponentInteraction } from "../utils/component.ts"
 
 export const setInteractionCreate = () => {
@@ -26,16 +26,22 @@ export const setInteractionCreate = () => {
 
 const executeChatInputInteraction = async (
   interaction: Interaction,
-): Promise<InteractionContext> => {
+): Promise<InteractionReplyer> => {
   const ctx = new ChatInputInteractionContext(interaction)
-  await PointCommand.execute(ctx)
+  const result = await PointCommand.execute(ctx)
+  if (!result.ok) {
+    console.log(result.err)
+  }
   return ctx
 }
 
 const executeComponentInteraction = async (
   interaction: Interaction,
-): Promise<InteractionContext> => {
+): Promise<InteractionReplyer> => {
   const ctx = new MessageComponentInteractionContext(interaction)
-  await PointExecutor.execute(ctx)
+  const result = await PointExecutor.execute(ctx)
+  if (!result.ok) {
+    console.log(result.err)
+  }
   return ctx
 }

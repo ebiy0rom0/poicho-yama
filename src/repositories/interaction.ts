@@ -21,9 +21,9 @@ export class InteractionRepository {
     guildID: bigint,
     timestamp: number,
   ): Promise<string | undefined> => {
-    const interaction = await dbHandler.get<
-      { token: string; expiredIn: number }
-    >([TOP_KEY, "token", `${guildID}/${timestamp}`])
+    const interaction = await dbHandler.get<{ token: string; expiredIn: number }>(
+      [TOP_KEY, "token", `${guildID}/${timestamp}`],
+    )
     return interaction.value?.token
   }
 

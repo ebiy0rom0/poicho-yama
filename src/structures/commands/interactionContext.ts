@@ -3,38 +3,32 @@ import {
   Interaction,
   InteractionCallbackData,
   InteractionResponseTypes,
+  Message,
 } from "../../deps.ts"
-import { InteractionContext } from "../types/mod.ts"
+import { InteractionMessageEditor, InteractionReplyer } from "../types/mod.ts"
+import { Failure, Result, Success, SuccessOnly } from "../types/result.ts"
 
-export class InteractionContextWithToken {
+export class InteractionContextWithToken implements InteractionMessageEditor {
   constructor(private token: string) {}
 
-  getOriginalMessage = async (token: string) => {
-    try {
-      return await bot.helpers.getOriginalInteractionResponse(token)
-    } catch (err: unknown) {
-      console.log(err)
-    }
-    return
+  getOriginalMessage = async (): Promise<Result<Message, Error>> => {
+    return await bot.helpers.getOriginalInteractionResponse(this.token)
+      .then((message) => Success(message))
+      .catch((reason) => Failure(new Error(reason)))
   }
 
   editOriginalResponse = async (
-    token: string,
     options: InteractionCallbackData,
   ) => {
-    await bot.helpers.editOriginalInteractionResponse(
-      token,
-      options,
-    )
+    return await bot.helpers.editOriginalInteractionResponse(this.token, options)
+      .then((_) => SuccessOnly())
+      .catch((reason) => Failure(new Error(reason)))
   }
 }
 
-export class InteractionContextImpl extends InteractionContextWithToken
-  implements InteractionContext {
+export class InteractionContext implements InteractionReplyer {
   replied = false
-  constructor(public interaction: Interaction, token?: string) {
-    super(typeof token !== "undefined" ? token : interaction.token)
-  }
+  constructor(public interaction: Interaction) {}
 
   get userID() {
     return this.interaction.user.id
