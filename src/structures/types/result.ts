@@ -1,3 +1,4 @@
+export type Empty = null
 export type Result<T, E extends Error> = Ok<T> | Err<E>
 
 export interface Ok<T = unknown> {
