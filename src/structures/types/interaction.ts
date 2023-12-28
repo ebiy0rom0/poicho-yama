@@ -1,11 +1,11 @@
 import { Interaction, InteractionCallbackData, Message } from "../../deps.ts"
-import { Result } from "./result.ts"
+import { Empty, Result } from "./result.ts"
 
 export interface InteractionMessageEditor {
   readonly getOriginalMessage: () => Promise<Result<Message, Error>>
   readonly editOriginalResponse: (
     options: InteractionCallbackData,
-  ) => Promise<Result<"ok", Error>>
+  ) => Promise<Result<Empty, Error>>
 }
 
 export interface InteractionReplyer {

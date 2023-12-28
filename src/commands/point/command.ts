@@ -7,7 +7,7 @@ import { PointCalculator } from "../../utils/calcurator.ts"
 import { InteractionRepository } from "../../repositories/interaction.ts"
 import { findMusic } from "../../config/musics.ts"
 import { CONTENTS_LIMIT, generateMessageFields } from "../../utils/commands/point.ts"
-import { Failure, SuccessOnly } from "../../structures/types/result.ts"
+import { Failure, Success } from "../../structures/utils/result.ts"
 
 const PointCommand = createCommand({
   name: "point",
@@ -82,7 +82,7 @@ const PointCommand = createCommand({
       flags: 1 << 6,
     })
 
-    return SuccessOnly()
+    return Success()
   },
 })
 

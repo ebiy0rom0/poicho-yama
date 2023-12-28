@@ -6,22 +6,23 @@ import {
   Message,
 } from "../../deps.ts"
 import { InteractionMessageEditor, InteractionReplyer } from "../types/mod.ts"
-import { Failure, Result, Success, SuccessOnly } from "../types/result.ts"
+import { Empty, Result } from "../types/result.ts"
+import { Failure, Success } from "../utils/result.ts"
 
 export class InteractionContextWithToken implements InteractionMessageEditor {
   constructor(private token: string) {}
 
-  getOriginalMessage = async (): Promise<Result<Message, Error>> => {
-    return await bot.helpers.getOriginalInteractionResponse(this.token)
+  getOriginalMessage = async (): Promise<Result<Message, Error>> => (
+    await bot.helpers.getOriginalInteractionResponse(this.token)
       .then((message) => Success(message))
       .catch((reason) => Failure(new Error(reason)))
-  }
+  )
 
   editOriginalResponse = async (
     options: InteractionCallbackData,
-  ) => {
+  ): Promise<Result<Empty, Error>> => {
     return await bot.helpers.editOriginalInteractionResponse(this.token, options)
-      .then((_) => SuccessOnly())
+      .then((_) => Success())
       .catch((reason) => Failure(new Error(reason)))
   }
 }

@@ -1,6 +1,7 @@
 import { MatrixRepository } from "../repositories/matrix.ts"
 import { Matrix, MatrixRows } from "../structures/types/mod.ts"
-import { Failure, Result, Success } from "../structures/types/result.ts"
+import { Result } from "../structures/types/result.ts"
+import { Failure, Success } from "../structures/utils/result.ts"
 
 const MAX_BONUS = 400 // from 0% to 400%
 const SCORE_RANGE = 125 // from 0 to 2,500,000
@@ -36,13 +37,7 @@ export class PointCalculator {
   ): Promise<Result<PointCalculator, Error>> => {
     const ins = new PointCalculator()
 
-    try {
-      await ins.load(base)
-    } catch (err) {
-      return Failure(err)
-    }
-
-    return Success(ins)
+    return await ins.load(base).then((_) => Success(ins)).catch((err) => Failure(err))
   }
 
   findRows = (pt: number): MatrixRows => this.#matrix.get(pt) ?? []
