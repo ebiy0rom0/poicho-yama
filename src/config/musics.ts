@@ -11,7 +11,13 @@ const Units: Record<string, number> = {
 type UnitsType = typeof Units[keyof typeof Units]
 
 const UnitColors: Record<UnitsType, number> = {
-  [Units.UNIT_25_NIGHTCODE]: 0xffffff,
+  [Units.UNIT_VIRTUAL_SINGER]: 0xFFFFFF,
+  [Units.UNIT_LEONEED]: 0x4455DD,
+  [Units.UNIT_MORE_MORE_JUMP]: 0x88DD44,
+  [Units.UNIT_VIVID_BAD_SQUAD]: 0xEE1166,
+  [Units.UNIT_WONDERLANDS_SHOWTIME]: 0xFF9900,
+  [Units.UNIT_25_NIGHTCODE]: 0x884499,
+  [Units.UNIT_OHTERS]: 0x999999,
 } as const
 
 type Music = {
