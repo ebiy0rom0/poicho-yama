@@ -21,14 +21,15 @@ const PointCommand = createCommand({
     },
     {
       type: ApplicationCommandOptionTypes.Boolean,
-      name: "test",
-      description: "boolean test",
+      name: "hide",
+      description: "結果表示を本人のみに表示します。(デフォルト: False)",
     },
   ],
 
   execute: async (ctx) => {
     const point = ctx.getOption<number>("point")!
     const title = ctx.getOption<string>("music")!
+    const hide = ctx.getOption<boolean>("hide") ?? false
     const music = findMusic(title)
 
     const result = await PointCalculator.New(music.base)
@@ -76,6 +77,7 @@ const PointCommand = createCommand({
           timestamp,
         ),
       ],
+      flags: hide ? 1 << 6 : 0,
     })
 
     return Success()
