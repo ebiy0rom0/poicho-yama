@@ -2,7 +2,7 @@ import { Messages, T } from "../../config/messages.ts"
 import { findMusic } from "../../config/musics.ts"
 import { InteractionRepository } from "../../repositories/interaction.ts"
 import { InteractionContextWithToken } from "../../structures/commands/interactionContext.ts"
-import { Failure, SuccessOnly } from "../../structures/types/result.ts"
+import { Failure, Success } from "../../structures/utils/result.ts"
 import { PointCalculator } from "../../utils/calcurator.ts"
 import { createExecutor } from "../../utils/command.ts"
 import { CONTENTS_LIMIT, generateMessageFields } from "../../utils/commands/point.ts"
@@ -31,10 +31,8 @@ const PointExecutor = createExecutor({
       +timestamp,
     )
     if (typeof token === "undefined") {
-      ctx.reply({
-        content: "[ERROR]Original interaction token has expired.",
-      })
-      return Failure(new Error(""))
+      ctx.reply({ content: Messages.ExpiredToken })
+      return Failure(new Error("token is expired."))
     }
 
     // It's possible to recover from the orginal message,
@@ -73,7 +71,7 @@ const PointExecutor = createExecutor({
         ),
       ],
     })
-    return SuccessOnly()
+    return Success()
   },
 })
 

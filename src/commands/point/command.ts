@@ -33,14 +33,14 @@ const PointCommand = createCommand({
 
     const result = await PointCalculator.New(music.base)
     if (!result.ok) {
-      return Failure(new Error(""))
+      return Failure(result.err)
     }
 
     const calcurator = result.value
     const rows = calcurator.findRows(point)
 
     if (rows.length === 0) {
-      await ctx.reply({ content: Messages.NotFound })
+      await ctx.reply({ content: T(Messages.NotFound, point) })
       return Failure(new Error("rows not found"))
     }
     const timestamp = await InteractionRepository.setToken(
@@ -48,9 +48,6 @@ const PointCommand = createCommand({
       ctx.interaction.token,
     )
 
-    if (rows.length === 0) {
-      return Failure(new Error(""))
-    }
     await ctx.reply({
       customId: name,
       content: T(Messages.Info, point),
@@ -79,7 +76,6 @@ const PointCommand = createCommand({
           timestamp,
         ),
       ],
-      flags: 1 << 6,
     })
 
     return Success()
