@@ -7,8 +7,8 @@ export class InteractionRepository {
 
   static setToken = async (guildID: bigint, token: string): Promise<number> => {
     const timestamp = Date.now()
-    // const expiredIn = timestamp + 5 * 60 * 1000  // 5 minutes later
-    const expiredIn = timestamp + 10 * 1000 // debug: 10 seconds later
+    const expiredIn = timestamp + 5 * 60 * 1000 // 5 minutes later
+    // const expiredIn = timestamp + 10 * 1000 // debug: 10 seconds later
     await dbHandler.set([TOP_KEY, "token", `${guildID}/${timestamp}`], {
       token,
       expiredIn,

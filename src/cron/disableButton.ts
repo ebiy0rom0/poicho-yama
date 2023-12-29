@@ -3,7 +3,7 @@ import { InteractionRepository } from "../repositories/interaction.ts"
 import { InteractionContextWithToken } from "../structures/commands/interactionContext.ts"
 import { disableButtonComponents } from "../utils/component.ts"
 
-Deno.cron("Disable buttons for expired token", "* * * * *", async () => {
+Deno.cron("Disable buttons for expired token", "*/5 * * * *", async () => {
   await Promise.all(
     (await InteractionRepository.getExpiredTokens()).map(async (token) => {
       const ctx = new InteractionContextWithToken(token)
