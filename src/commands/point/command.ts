@@ -6,10 +6,12 @@ import { createPager } from "../../utils/component.ts"
 import { PointCalculator } from "../../utils/calcurator.ts"
 import { InteractionRepository } from "../../repositories/interaction.ts"
 import { findMusic } from "../../config/musics.ts"
-import { CONTENTS_LIMIT, generateMessageFields } from "../../utils/commands/point.ts"
+import {
+  COMMAND_NAME,
+  CONTENTS_LIMIT,
+  generateMessageFields,
+} from "../../utils/commands/point.ts"
 import { Failure, Success } from "../../structures/utils/result.ts"
-
-const COMMAND_NAME = "point"
 
 const PointCommand = createCommand({
   name: COMMAND_NAME,

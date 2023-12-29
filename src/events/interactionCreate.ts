@@ -9,7 +9,6 @@ import { isComponentInteraction } from "../utils/component.ts"
 
 export const setInteractionCreate = () => {
   bot.events.interactionCreate = async (_, interaction) => {
-    console.log(interaction)
     const ctx =
       await (isComponentInteraction(interaction)
         ? executeComponentInteraction(interaction)
