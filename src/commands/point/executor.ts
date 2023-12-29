@@ -5,7 +5,11 @@ import { InteractionContextWithToken } from "../../structures/commands/interacti
 import { Failure, Success } from "../../structures/utils/result.ts"
 import { PointCalculator } from "../../utils/calcurator.ts"
 import { createExecutor } from "../../utils/command.ts"
-import { CONTENTS_LIMIT, generateMessageFields } from "../../utils/commands/point.ts"
+import {
+  COMMAND_NAME,
+  CONTENTS_LIMIT,
+  generateMessageFields,
+} from "../../utils/commands/point.ts"
 import { createPager, parseCustomID } from "../../utils/component.ts"
 import { createEmbed, createEmbedFooter } from "../../utils/embed.ts"
 
@@ -39,7 +43,7 @@ const PointExecutor = createExecutor({
     // but rebuild the message to reduce the number of API requests.
     const tctx = new InteractionContextWithToken(token)
     tctx.editOriginalResponse({
-      customId: name,
+      customId: COMMAND_NAME,
       content: T(Messages.Info, point),
       embeds: [
         createEmbed({
