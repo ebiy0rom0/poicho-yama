@@ -9,8 +9,10 @@ import { findMusic } from "../../config/musics.ts"
 import { CONTENTS_LIMIT, generateMessageFields } from "../../utils/commands/point.ts"
 import { Failure, Success } from "../../structures/utils/result.ts"
 
+const COMMAND_NAME = "point"
+
 const PointCommand = createCommand({
-  name: "point",
+  name: COMMAND_NAME,
   description: "独りんぼエンヴィーのポイント獲得表を表示します。",
   options: [
     {
@@ -50,7 +52,7 @@ const PointCommand = createCommand({
     )
 
     await ctx.reply({
-      customId: name,
+      customId: COMMAND_NAME,
       content: T(Messages.Info, point),
       embeds: [
         createEmbed({
