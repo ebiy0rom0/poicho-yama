@@ -1,2 +1,1 @@
-
-export const dbHandler = await Deno.openKv()
+export const dbHandler = await Deno.openKv("db/local.db")

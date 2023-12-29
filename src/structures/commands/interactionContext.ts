@@ -2,27 +2,52 @@ import { bot } from "../../clients/bot.ts"
 import {
   Interaction,
   InteractionCallbackData,
-  InteractionResponseTypes
+  InteractionResponseTypes,
+  Message,
 } from "../../deps.ts"
-import { InteractionContext } from "../types/mod.ts"
+import { InteractionMessageEditor, InteractionReplyer } from "../types/mod.ts"
+import { Empty, Result } from "../types/result.ts"
+import { Failure, Success } from "../utils/result.ts"
 
-export class InteractionContextImpl implements InteractionContext {
+export class InteractionContextWithToken implements InteractionMessageEditor {
+  constructor(private token: string) {}
+
+  getOriginalMessage = async (): Promise<Result<Message, Error>> => (
+    await bot.helpers.getOriginalInteractionResponse(this.token)
+      .then((message) => Success(message))
+      .catch((reason) => Failure(new Error(reason)))
+  )
+
+  editOriginalResponse = async (
+    options: InteractionCallbackData,
+  ): Promise<Result<Empty, Error>> => {
+    return await bot.helpers.editOriginalInteractionResponse(this.token, options)
+      .then((_) => Success())
+      .catch((reason) => Failure(new Error(reason)))
+  }
+}
+
+export class InteractionContext implements InteractionReplyer {
   replied = false
   constructor(public interaction: Interaction) {}
 
-  get userID () { return this.interaction.user.id }
-  get username () { return this.interaction.user.username }
+  get userID() {
+    return this.interaction.user.id
+  }
+  get username() {
+    return this.interaction.user.username
+  }
 
   getOption = <T>(name: string): T | undefined => {
     const options = this.interaction.data?.options ?? []
-    return options.find(opt => opt.name === name)?.value as T
+    return options.find((opt) => opt.name === name)?.value as T
   }
 
   reply = async (options: InteractionCallbackData) => {
     if (this.replied) {
       await bot.helpers.editOriginalInteractionResponse(
         this.interaction.token,
-        options
+        options,
       )
       return
     }
@@ -30,20 +55,15 @@ export class InteractionContextImpl implements InteractionContext {
     this.replied = true
     await bot.helpers.sendInteractionResponse(
       this.interaction.id,
-      this.interaction.token, {
-      type: InteractionResponseTypes.ChannelMessageWithSource,
-      data: options
-    })
+      this.interaction.token,
+      {
+        type: InteractionResponseTypes.ChannelMessageWithSource,
+        data: options,
+      },
+    )
   }
 
   replyOnce = async (options: InteractionCallbackData) => {
     if (!this.replied) await this.reply(options)
-  }
-
-  editOriginalResponse = async (token: string, options: InteractionCallbackData) => {
-    await bot.helpers.editOriginalInteractionResponse(
-      token,
-      options
-    )
   }
 }

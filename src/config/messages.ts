@@ -1,6 +1,7 @@
-
 export const Messages = {
-  Info: "{0}ポイントだね？\rオッケー、ボクに任せてよ！"
+  Info: "{0}ポイントだね？\rオッケー、ボクに任せてよ！",
+  NotFound: "ごめんね！{0}ポイントは見つからなかったよ。",
+  ExpiredToken: "時間切れみたいだね？",
 }
 
 // deno-lint-ignore no-explicit-any

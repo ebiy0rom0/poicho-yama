@@ -1,7 +1,9 @@
-import { InteractionContextImpl } from "./interactionContext.ts"
-import { ComponentInteractionContext } from "./../types/mod.ts"
+import { InteractionContext } from "./interactionContext.ts"
+import { ComponentInteractionReplyer } from "./../types/mod.ts"
 
-
-export class MessageComponentInteractionContext extends InteractionContextImpl implements ComponentInteractionContext {
-  get customID () { return this.interaction.data?.customId! }
+// deno-fmt-ignore
+export class MessageComponentInteractionContext extends InteractionContext implements ComponentInteractionReplyer {
+  get customID() {
+    return this.interaction.data?.customId!
+  }
 }

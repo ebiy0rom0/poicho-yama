@@ -1,5 +1,14 @@
 {
-    "deno.enable": true,
-    "deno.lint": true,
-    "deno.unstable": true
+  "deno.enable": true,
+  "deno.lint": true,
+  "deno.unstable": true,
+  "[typescript]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "denoland.vscode-deno"
+  },
+  "deno.config": "./deno.json",
+  "json.schemas": [{
+    "fileMatch": ["/deno.json"],
+    "url": "https://deno.land/x/deno/cli/schemas/config-file.v1.json"
+  }]
 }
